@@ -8,13 +8,13 @@ namespace Sales_Receipt
 {
     public class Receipt
     {
-        int CustomerID { get; set; }
-        int CogQuantity { get; set; }
-        int GearQuantity { get; set; }
-        double CogPrice { get; set; }
-        double GearPrice { get; set; }
-        DateTime SaleDate { get; set; }
-        double SalesTaxPercent { get; set; }
+        public int CustomerID { get; set; }
+        public int CogQuantity { get; set; }
+        public int GearQuantity { get; set; }
+        private double CogPrice { get; set; }
+        private double GearPrice { get; set; }
+        public DateTime SaleDate { get; set; }
+        private double SalesTaxPercent { get; set; }
 
         public Receipt(int id, int cog, int gear)
         {
@@ -26,18 +26,49 @@ namespace Sales_Receipt
             SaleDate = DateTime.Now;
             SalesTaxPercent = .089;
         }
-        public double CalculateTotal()
+        public double CalculateNetAmount()
         {
             int totalQty = CogQuantity + GearQuantity;
-            if (totalQty<= 10)
+            double markup;
+
+            if (totalQty > 10 || CogQuantity > 10 || GearQuantity >= 18)
             {
-                double markup = .15;
+                markup = .125;
+
             }
             else
             {
-               double markup = 12.5;
+               markup = .15;
             }
+            
+            double cogTotal = CogQuantity * CogPrice * (1 + markup);
+            double gearTotal = GearQuantity * GearPrice * (1 + markup);
+
+            return cogTotal + gearTotal;
+
 
         }
+        public double CalculateTaxAmount()
+        {
+            return CalculateNetAmount() * SalesTaxPercent;
+        }
+
+        public double CalculateTotal()
+        {
+            return CalculateNetAmount() + CalculateTaxAmount();
+        }
+
+        public void PrintReceipt()
+        {
+            Console.WriteLine("Receipt");
+            Console.WriteLine($"CustomerID: {CustomerID}");
+            Console.WriteLine($"Sale Date: {SaleDate}");
+            Console.WriteLine($"COGS: {CogQuantity} Price: {CogPrice}");
+            Console.WriteLine($"Gears: {GearQuantity} Price: {GearPrice}");
+            Console.WriteLine($"Total Before Tax: {CalculateNetAmount():C}");
+            Console.WriteLine($"Sales Tax: {CalculateTaxAmount():C}");
+            Console.WriteLine($"Total Amount Due: {CalculateTotal():C}");
+        }
+
     }
 }
